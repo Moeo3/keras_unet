@@ -1,7 +1,7 @@
 from keras.models import Input, Model
 from keras.layers.convolutional import Conv2D, Conv2DTranspose, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
-from keras.backend import Concatenate
+from keras.layers import Concatenate
 from copy import deepcopy
 
 def conv_33(inputs, ch, acti):
@@ -19,9 +19,8 @@ def build_level(inputs, ch, depth, inc_rate, acti):
         outputs = conv_block(inputs, ch, acti)
     else:
         # down
-        outputs = conv_block(inputs, ch, acti)
-        concatenate_part = deepcopy(outputs)
-        outputs = MaxPooling2D()(outputs)
+        concatenate_part = conv_block(inputs, ch, acti)
+        outputs = MaxPooling2D()(concatenate_part)
 
         #recursive
         outputs = build_level(outputs, int(inc_rate * ch), depth - 1, inc_rate, acti)
@@ -36,4 +35,4 @@ def UNet(img_size = (512, 512, 1), start_conv_ch = 64, out_ch = 1, inc_rate = 2.
     inputs = Input(img_size)
     outputs = build_level(inputs, start_conv_ch, max_depth, inc_rate, acti)
     outputs = Conv2D(out_ch, 1, activation='sigmoid')(outputs)
-    return Model(input=inputs, output=outputs)
+    return Model(inputs, outputs)

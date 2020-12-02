@@ -13,16 +13,16 @@ def read_train_data(data_path = './train', feature = 'image', label = 'label'):
     for png in os.listdir(feature_path):
         img = Image.open(os.path.join(feature_path, png))
         img = np.asarray(img)[:, :, None]
-        features.append(img)
+        features.append(img/ 255)
         pass
-    features = np.asarray(features)
+    features = np.asarray(features).astype(np.float32)
     
     labels = []
     for png in os.listdir(label_path):
         img = Image.open(os.path.join(label_path, png))
         img = np.asarray(img)[:, :, None]
-        labels.append(img // 255)
+        labels.append(img / 255)
         pass
-    labels = np.asarray(labels)
+    labels = np.asarray(labels).astype(np.float32)
 
     return features, labels
